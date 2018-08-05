@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="Color.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/brain.js@1.1.2/browser.min.js"></script>
+</head>
+<body>
+    <input type="color" value="#ff0000"/>
+<div id="example">Example Text</div>
+<script>
+    function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+const network = new brain.NeuralNetwork()
+
+network.train([
+  { input: { r: 0.62, g: 0.72, b: 0.88 }, output: { light: 1 } },
+  { input: { r: 0.1, g: 0.84, b: 0.72 }, output: { light: 1 } },
+  { input: { r: 0.33, g: 0.24, b: 0.29 }, output: { dark: 1 } },
+  { input: { r: 0.74, g: 0.78, b: 0.86 }, output: { light: 1 } },
+  { input: { r: 0.31, g: 0.35, b: 0.41 }, output: { dark: 1 } },
+  { input: {r: 1, g: 0.99, b: 0}, output: { light: 1 } },
+  { input: {r: 0.77, g: 0.78, b:0.22}, output: { dark: 1 }}
+])
+const input = document.querySelector("input")
+const example = document.querySelector("#example")
+const result = network.run({ input: {r: 1, g: 0.42, b: 0.52} })
+input.addEventListener("change", (e) => {
+  var newrgb = hexToRgb(e.target.value)
+    newrgb.r = newrgb.r/255
+    newrgb.r = newrgb.r.toFixed(2);
+    newrgb.g = newrgb.g/255
+    newrgb.g = newrgb.g.toFixed(2);
+    newrgb.b = newrgb.b/255
+    newrgb.b = newrgb.b.toFixed(2);
+    console.log(newrgb)
+    var result = brain.likely(newrgb, network)
+    console.log("Background is "+result)
+
+    example.style.background= e.target.value;
+    console.log("works")
+    if(result == "dark"){
+        example.style.color="White"
+    }else{
+        example.style.color = "Black"
+    }
+      
+});
+</script>
+</body>
+</html>
